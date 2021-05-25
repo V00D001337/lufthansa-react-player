@@ -1,99 +1,102 @@
-// tsrafc
 import React, { useEffect, useState } from 'react'
-import { Playlist } from '../../model/Playlist'
 import { PlaylistDetails } from '../components/PlaylistDetails'
 import { PlaylistEditForm } from '../components/PlaylistEditForm'
 import { PlaylistList } from '../components/PlaylistList'
+import {Playlist} from '../../model/Playlist'
+import { PlaylistCreateForm } from '../components/PlaylistCreateForm'
 
-interface Props { }
+interface Props {
 
-const data: Playlist[] = [
+}
+
+const playlists: Playlist[] = [
     {
         id: '123',
-        name: 'Playlista 😇',
+        name: 'plejlista123',
         public: true,
-        description: 'no i co ja dzis polubie?..🤔'
+        description: 'Lubie placki'
     },
     {
         id: '234',
-        name: 'Playlista 😁',
+        name: 'plejlista234',
         public: false,
-        description: 'moze polubię TypeScript?. 🚀'
+        description: 'Lubie placki'
     },
     {
-        id: '345',
-        name: 'Playlista 😆',
+        id: '567',
+        name: 'plejlista567',
         public: true,
-        description: 'albo wszystko polubię co mi tam 😅💖'
-    },
-
+        description: 'Lubie placki'
+    }
 ]
 
+
 export const PlaylistsView = (props: Props) => {
+    const [forceUpdate, setForceUpdate] = useState(Date.now())
     const [selectedId, setSelectedId] = useState<string | undefined>()
     const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | undefined>()
-    const [mode, setMode] = useState<'details' | 'form'>('details')
-    const [playlists, setPlaylists] = useState<Playlist[]>(data)
-
-    /* TODO:
-
-        - git checkout -b mojezadanie1
-        - git add .
-        - git commit -m "Moje zadanie"
-        - git checkout master
-        - git pull
-        - git checkout -b mojezadanie2
-        - szuru buru...
-        - git add .
-        - git commit -m "Moje zadanie 2"
+    const [mode, setMode] = useState<'details' | 'form' | 'create'>('details')
+    const [list, setList] = useState<Playlist[]>(playlists)
 
 
-        - Show "Please select playlist when nothing selected"
-        - Remove playlists when X clicked
-        - Create new playlist
-            - Show Empty form when button [ Create new playlist ] cliked
-            - Cancel... go back to details.
-            - Save - add new playlist to list and select in in details.
-    */
+    const save = (draft: Playlist) => {
+        const newData = list.map((item) => {
+            return item.id === draft.id ? draft : item
+        })
+        setList(newData);
+        setMode('details');
+    }
+
+    const onDelete = (id: Playlist['id']) => {
+        const newData = list.filter((item) => item.id !== id);
+        setList(newData);
+        setMode('details')
+    }
+
+    const onCreate = (draft: Playlist) => {
+        const newData = list.slice();
+        newData.push(draft);
+        setList(newData);
+        setSelectedId(draft.id);
+        setMode('details')
+    }
 
     const edit = () => {
         setMode('form')
     }
+
     const cancel = () => {
         setMode('details')
     }
-    const save = (draft: Playlist) => {
-        setMode('details')
-        setPlaylists(playlists.map(p => p.id === draft.id ? draft : p))
+
+    const create = () => {
+        setMode('create')
     }
 
     useEffect(() => {
-        setSelectedPlaylist(playlists.find(p => p.id == selectedId))
-    }, [selectedId, playlists])
+        setSelectedPlaylist(list.find(p => p.id === selectedId))
+    }, [selectedId, forceUpdate, list])
 
     return (
         <div>
             <h4>PlaylistsView</h4>
-            {/* .row>.col*2 */}
             <div className="row">
                 <div className="col">
-                    <PlaylistList
-                        onSelected={id => { setSelectedId(id) }}
-                        playlists={playlists}
-                        selectedId={selectedId} />
-
-                    <button className="btn btn-info btn-block mt-4">Create New Playlist</button>
+                    <PlaylistList 
+                    playlists = {list}
+                    selectedId={selectedId}
+                    onSelected={id => {
+                        setSelectedId(id)
+                    }}
+                    onDelete={onDelete}
+                    />
+                    {mode !== 'create' && <button className="btn btn-info btn-block mt-4" onClick={create}>Create New Playlist</button>}
                 </div>
                 <div className="col">
-                    {selectedPlaylist && mode === 'details' && <PlaylistDetails
-                        edit={edit}
-                        playlist={selectedPlaylist} />}
-                    {selectedPlaylist && mode === 'form' && <PlaylistEditForm
-                        save={save}
-                        playlist={selectedPlaylist}
-                        cancel={cancel} />}
-
-                        <div className="alert alert-info">Please select playlist</div>
+                    {selectedPlaylist && mode ==='details' && <PlaylistDetails edit={edit} playlist={selectedPlaylist}/>}
+                    {selectedPlaylist && mode === 'form' && <PlaylistEditForm save={save} cancel={cancel} playlist={selectedPlaylist} />}
+                    {mode === 'create' && <PlaylistCreateForm cancel={cancel} add={onCreate}/>}
+                    {!selectedPlaylist && mode !== 'create' &&<div className="alert alert-info">Please select playlist</div>}
                 </div>
             </div>
         </div>

@@ -1,27 +1,24 @@
-import React, { useState } from 'react'
-import { Playlist } from '../../model/Playlist'
+import React from 'react'
+import {Playlist} from '../../model/Playlist'
 
 interface Props {
-    playlists: Playlist[]
+    playlists: Playlist []
     selectedId?: string
-    onSelected(id: string): void
+    onSelected(id: Playlist['id']): void
+    onDelete(id: Playlist['id']): void
 }
 
-export const PlaylistList = ({ playlists, selectedId, onSelected }: Props) => {
 
+export const PlaylistList = (props: Props) => {
     return (
-        <div>
-            <div className="list-group">
-                {playlists.map((playlist, index) =>
-                    <div className={`list-group-item ${selectedId === playlist.id ? 'active' : ''}`}
-                        onClick={() => onSelected(playlist.id)}
-                        key={playlist.id}>
-                        {playlist.name}
-
-                        <span className="close">&times;</span>
-                    </div>
-                )}
-            </div>
+        <div className="list-group">
+            {props.playlists.map((item, index) =>
+                <div className={`list-group-item ${props.selectedId === item.id ? 'active' : ''}`}
+                onClick={() => props.onSelected(item.id)}
+                key={item.id}>{item.name}
+                <span style={{float: "right", cursor:"pointer"}} className="close" onClick={() => props.onDelete(item.id)}>&times;</span>
+                </div>
+            )}
         </div>
     )
 }
