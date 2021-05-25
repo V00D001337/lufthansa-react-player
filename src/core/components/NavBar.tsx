@@ -31,6 +31,9 @@ export const NavBar = (props: Props) => {
                             <li className="nav-item">
                                 <NavLink className="nav-link" to="/tracks">Tracks</NavLink>
                             </li>
+                            <li className="nav-item">
+                                <NavLink className="nav-link" to="/form">Form</NavLink>
+                            </li>
                             {/* <LinkDecorator to="/playlists" className="nav-link" /> */}
                         </ul>
                     </div>
