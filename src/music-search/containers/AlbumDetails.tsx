@@ -1,9 +1,15 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router'
+import { idText } from 'typescript'
 import { fetchAlbumById } from '../../core/hooks/usePlaylists'
+import { playlistsSelect } from '../../core/reducers/PlaylistsReducer'
 import { fetchAlbumFailed, fetchAlbumStart, fetchAlbumSuccess, selectAlbum, selectAlbumFetchState } from '../../core/reducers/SearchReducer'
+import { tracksAddToPlaylist } from '../../core/reducers/TracksReducer'
+import { Playlist } from '../../model/Playlist'
+import { SimpleTrack, Track } from '../../model/Search'
 import SelectPlaylist from '../../playlists/components/SelectPlaylist'
+import { AppState } from '../../store'
 import { AlbumCard } from '../components/AlbumCard'
 
 interface Props {
@@ -11,35 +17,34 @@ interface Props {
 }
 
 export const AlbumDetails = (props: Props) => {
-    // album_id: 5Tby0U5VndHW0SomYO7Id7
-
-    // 1. State - What is needed in Component/React
-    // album 
-    // loading
-    // message
-
-    // 2. Action - What we can do
-    // start, success, failed
-
-    // TODO:
-    // Use Fake ID
-    // Fetch data from server
-    // Dispatch data to reducer
-    // Display data + loading + error from reducer
-    // Get ID from router
     const dispatch = useDispatch()
     const { isLoading, message } = useSelector(selectAlbumFetchState)
     const album = useSelector(selectAlbum)
+    const playlists = useSelector((state: AppState) => 
+    state.playlists.items)
+    const selectedPlaylist = useSelector((state: AppState) =>
+    state.playlists.items.find(p => p.id === state.playlists.selectedId))
     const { album_id } = useParams<{ album_id: string }>()
 
-    useEffect(() => {
-
+    useEffect(() => { 
+        dispatch(playlistsSelect(''))
         dispatch(fetchAlbumStart(album_id))
-
         fetchAlbumById(album_id)
             .then(data => { dispatch(fetchAlbumSuccess(data)) })
             .catch(error => { dispatch(fetchAlbumFailed(error)) })
     }, [album_id])
+
+    const onSelectPlaylist = (playlist_id: Playlist['id']) => {
+        dispatch(playlistsSelect(playlist_id))
+    }
+
+    const onAddTrack = (track: Track) => {
+        const simpleTrack: SimpleTrack = {
+            id: track.id,
+            name: track.name
+        }
+        dispatch(tracksAddToPlaylist(simpleTrack))
+    }
 
     if (isLoading) { return <Loading /> }
 
@@ -68,7 +73,8 @@ export const AlbumDetails = (props: Props) => {
                         <dt>Artist:</dt>
                         <dd>{album?.artists[0]?.name}</dd>
                     </dl>
-
+                    {console.log(album)
+                    }
                     {/* 
                         TODO:
                             - search results - clicking PhilCollins redirects here with ID
@@ -78,13 +84,11 @@ export const AlbumDetails = (props: Props) => {
                             - on button click add track to selected playlist
                     */}
 
-                    <SelectPlaylist playlists={[]} onSelect={() => { }} />
+                    <SelectPlaylist playlists={playlists} onSelect={onSelectPlaylist} />
 
                     <h3>Tracks</h3>
-                    {album?.tracks.items.map(track =>
-                        <p>
-                            .... (+) add to selected playlist
-                        </p>
+                    {album?.tracks?.items.map(track =>
+                        <div>{track.name} {track.name && selectedPlaylist?.id && <button className='btn btn-success' onClick={() => onAddTrack(track)}>(+) add to selected playlist</button>}</div>
                     )}
 
 

@@ -2,12 +2,11 @@ import { Reducer } from "react";
 import { Playlist } from "../../model/Playlist";
 import { SimpleTrack, Track } from "../../model/Search";
 import { AppState } from "../../store";
+import { playlistsAdd } from "./PlaylistsReducer";
 
 export interface TracksState {
     playlists: Playlist[]
-
     tracks: { [key: string]: SimpleTrack }
-
     selectedPlaylistId?: Playlist['id']
     selectedTrackId?: Track['id']
 }
@@ -28,6 +27,9 @@ type TRACKS_SELECT = {
 type TRACKS_UPDATE = {
     type: 'TRACKS_UPDATE'; payload: { draft: SimpleTrack; };
 };
+type TRACKS_ADD_TO_PLAYLIST = {
+    type: 'TRACKS_ADD_TO_PLAYLIST'; payload: { track: SimpleTrack }
+}
 
 type Actions =
     | PLAYLISTS_LOAD
@@ -35,6 +37,7 @@ type Actions =
     | PLAYLISTS_SELECT
     | TRACKS_SELECT
     | TRACKS_UPDATE
+    | TRACKS_ADD_TO_PLAYLIST
 
 const initialState: TracksState = {
     playlists: [],
@@ -69,6 +72,21 @@ const reducer: Reducer<TracksState, Actions> = (
             ...state,
             tracks: reduceTracks(state.tracks, action.payload.items)
         }
+        case 'TRACKS_ADD_TO_PLAYLIST': {
+            const playlist = state.playlists.find(p => p.id === state.selectedPlaylistId)
+            playlist?.tracks?.push(action.payload.track)
+            if (playlist) {
+                return {
+                    ...state,
+                    playlists: state.playlists.map(p => p.id === playlist.id ? playlist : p),
+                    tracks: {...state.tracks, [action.payload.track.id]: action.payload.track}
+                }
+            }
+            else {
+                return state
+            }
+        }
+        
         default: return state
     }
 }
@@ -92,6 +110,9 @@ export const tracksSelect = (id: SimpleTrack['id']): TRACKS_SELECT => ({
 })
 export const tracksUpdate = (draft: SimpleTrack): TRACKS_UPDATE => ({
     type: 'TRACKS_UPDATE', payload: { draft }
+})
+export const tracksAddToPlaylist = (track: SimpleTrack): TRACKS_ADD_TO_PLAYLIST => ({
+    type: 'TRACKS_ADD_TO_PLAYLIST', payload: { track }
 })
 
 /* Selectors */
