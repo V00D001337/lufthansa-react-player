@@ -1,13 +1,12 @@
 import React from 'react'
-import { AlbumGrid } from '../components/AlbumGrid'
+import { fetchArtists, useFetch } from '../../core/hooks/useSearch'
+import { ArtistGrid } from '../components/ArtistGrid'
 import { SearchForm } from '../components/SearchForm'
-import { useSearchAlbums } from '../../core/hooks/useSearchAlbums'
-import { fetchAlbums, useFetch } from '../../core/hooks/useSearch'
 
 interface Props { }
 
-export const MusicSearchView = (props: Props) => {
-    const [{ isLoading, message, results }, setQuery] = useFetch(fetchAlbums)
+export const ArtistSearchView = (props: Props) => {
+    const [{ isLoading, message, results }, setQuery] = useFetch(fetchArtists)
 
     return (
         <div>
@@ -21,9 +20,10 @@ export const MusicSearchView = (props: Props) => {
                     {isLoading && <p className="alert alert-info">Loading</p>}
                     {message && <p className="alert alert-danger">{message}</p>}
 
-                    {results && <AlbumGrid albums={results} />}
+                    {results && <ArtistGrid artists={results} />}
                 </div>
             </div>
         </div>
     )
 }
+

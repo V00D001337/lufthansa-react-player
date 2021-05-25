@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PlaylistsView } from './playlists/containers/PlaylistsView';
 
-// npm i bootstrap
-import 'bootstrap/dist/css/bootstrap.css'
+
+import { NavigationBar } from './NavigationBar';
+import { ArtistSearchView } from './music-search/containers/ArtistSearchView';
 import { MusicSearchView } from './music-search/containers/MusicSearchView';
 
 function App() {
+  const [mode, setMode] = useState<'playlists' | 'searchAlbums' | 'searchArtists'>('playlists')
+
   return (
     <div>
       {/* .container>.row>.col */}
@@ -14,14 +17,16 @@ function App() {
           <div className="col">
 
             <h1>MusicApp</h1>
-
-            {/* <PlaylistsView /> */}
-            <MusicSearchView/>
+            <NavigationBar changeMode = {setMode}/>
+            <br/>
+            {mode === 'playlists' && <PlaylistsView />}
+            {mode === 'searchAlbums' && <MusicSearchView/>}
+            {mode === 'searchArtists' && <ArtistSearchView/>}
           </div>
         </div>
       </div>
-    </div>
-  );
-}
+      </div>
+      );
+    }
 
-export default App;
+  export default App;
