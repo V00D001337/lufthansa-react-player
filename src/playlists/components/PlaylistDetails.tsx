@@ -6,10 +6,11 @@ import styles from './PlaylistDetails.module.css'
 
 interface Props {
     playlist: Playlist
+    edit(): void
 }
 
 
-export const PlaylistDetails: React.FC<Props> = ({ playlist }) => {
+export const PlaylistDetails: React.FC<Props> = ({ playlist, edit }) => {
     return (
         <div>
             <dl data-playlist-id={playlist.id}>
@@ -26,7 +27,7 @@ export const PlaylistDetails: React.FC<Props> = ({ playlist }) => {
                 <dd>{playlist.description}</dd>
             </dl>
             
-            <button className="btn btn-edit">Edit</button>
+            <button className="btn btn-primary" onClick={() => edit()}>Edit</button>
         </div>
     )
 }

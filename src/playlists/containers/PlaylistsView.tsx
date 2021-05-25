@@ -41,6 +41,7 @@ export const PlaylistsView = (props: Props) => {
     const [selectedId, setSelectedId] = useState<string | undefined>('234')
     const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | undefined>()
     const [mode, setMode] = useState<'details' | 'form'>('details')
+    const [list, setList] = useState<Playlist[]>(playlists)
 
     /* TODO:
         - Przycisk Edit w Details "przełącza" na formularza (*zmiana mode! props!)
@@ -53,21 +54,25 @@ export const PlaylistsView = (props: Props) => {
         - Zapisana playlista jest widoczna na liscie i w details!
     */
 
-    const edit = () => {/*  */ }
-    const cancel = () => {/*  */ }
+    const edit = () => { setMode('form') }
+
+    const cancel = () => { setMode('details')}
+
     const save = (draft: Playlist) => {
-        /* update playlistS!   */
-        const index = playlists.findIndex(p => p.id === draft.id)
-        if (index !== -1) {
-            playlists[index] = draft /// WRONG!! Mutable Code!
-        }
+        const newData = list.map((item) => {
+            return item.id === draft.id ? draft : item
+        })
+        console.log(newData);
+        
+        setList(newData);
+        setMode('details');
     }
 
 
     useEffect(() => {
-        setSelectedPlaylist(playlists.find(p => p.id == selectedId))
+        setSelectedPlaylist(list.find(p => p.id == selectedId))
 
-    }, [selectedId, forceUpdate])
+    }, [selectedId, forceUpdate, list])
 
     return (
         <div>
@@ -79,7 +84,7 @@ export const PlaylistsView = (props: Props) => {
                 <div className="col">
                     <PlaylistList
                         onSelected={id => { setSelectedId(id) }}
-                        playlists={playlists}
+                        playlists={list}
                         selectedId={selectedId} />
 
 
@@ -88,9 +93,8 @@ export const PlaylistsView = (props: Props) => {
                 </div>
                 <div className="col">
 
-                    {selectedPlaylist && mode === 'details' && <PlaylistDetails playlist={selectedPlaylist} />}
-
-                    {selectedPlaylist && mode === 'form' && <PlaylistEditForm playlist={selectedPlaylist} />}
+                    {selectedPlaylist && mode === 'details' && <PlaylistDetails edit={edit} playlist={selectedPlaylist} />}
+                    {selectedPlaylist && mode === 'form' && <PlaylistEditForm save={save} cancel={cancel} playlist={selectedPlaylist} />}
                 </div>
             </div>
         </div>

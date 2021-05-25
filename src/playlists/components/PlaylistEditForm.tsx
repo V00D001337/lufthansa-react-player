@@ -3,10 +3,12 @@ import { Playlist } from '../../model/Playlist'
 
 interface Props {
     playlist: Playlist;
+    cancel(): void;
+    save(draft: Playlist): void;
 }
 
 
-export const PlaylistEditForm = ({ playlist }: Props) => {
+export const PlaylistEditForm = ({ playlist, cancel: closeEdit, save }: Props) => {
     const [message, setMessage] = useState('')
     const [acceptNew, setAcceptNew] = useState(false)
 
@@ -29,6 +31,16 @@ export const PlaylistEditForm = ({ playlist }: Props) => {
             }
         }
     }, [playlist, acceptNew, playlistId])
+
+    const onSave = () => {
+        const draft: Playlist = {
+            id: playlistId,
+            name: name,
+            public: isPublic,
+            description: description
+        }
+        save(draft);
+    }
 
     return (
         <div>
@@ -53,8 +65,8 @@ export const PlaylistEditForm = ({ playlist }: Props) => {
                 <textarea className="form-control" value={description} onChange={e => setDescription(e.target.value)} ></textarea>
             </div>
 
-            <button className="btn btn-danger">Cancel</button>
-            <button className="btn btn-success">Save</button>
+            <button className="btn btn-danger" onClick={closeEdit}>Cancel</button>
+            <button className="btn btn-success" onClick={onSave}>Save</button>
         </div>
     )
 }
