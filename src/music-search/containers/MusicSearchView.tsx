@@ -1,5 +1,5 @@
-import React from 'react'
-import { Album, AlbumView } from '../../model/Search'
+import React, { useState } from 'react'
+import { AlbumView } from '../../model/Search'
 import { AlbumGrid } from '../components/AlbumGrid'
 import { SearchForm } from '../components/SearchForm'
 
@@ -17,23 +17,25 @@ const albumsMock: AlbumView[] = [
 */
 
 export const MusicSearchView = (props: Props) => {
+    const [results, setResults] = useState<AlbumView[]>([])
 
     const searchAlbums = (query: string) => {
         console.log('Search :', query)
+        setResults(albumsMock)
     }
 
     return (
         <div>
             <div className="row">
                 <div className="col">
-                    <SearchForm />
+                    <SearchForm onSearch={searchAlbums}/>
                 </div>
             </div>
             <div className="row">
                 <div className="col">
-                    <AlbumGrid />
+                    <AlbumGrid albums = {results}/>
                 </div>
             </div>
         </div>
     )
-}
+} 
